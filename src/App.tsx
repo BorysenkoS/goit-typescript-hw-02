@@ -34,7 +34,6 @@ function App() {
       try {
         setLoading(true);
         const data = await fetchPhotosApi(searchValue, pageNumber);
-        console.log(searchValue);
 
         setPhotos((prev) => [...prev, ...data.results]);
         setTotalPage(data.total_pages);
