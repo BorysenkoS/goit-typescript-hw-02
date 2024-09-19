@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { fetchPhotosApi } from "./components/services/photos-api";
 import SearchBar from "./components/SearchBar/SearchBar";
 import ImageGallery from "./components/ImageGallery/ImageGallery";
@@ -6,16 +6,19 @@ import Loader from "./components/Loader/Loader";
 import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
 import LoadMoreBtn from "./components/LoadMoreBtn/LoadMoreBtn";
 import ImageModal from "./components/ImageModal/ImageModal";
+import { string } from "yup";
+import { imageItem, Photo } from "./components/types";
+import { ApiResponse } from "unsplash-js/dist/helpers/response";
 
 function App() {
-  const [photos, setPhotos] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [searchValue, setSearchValue] = useState("");
-  const [pageNumber, setPageNumber] = useState(1);
-  const [totalPage, setTotalPage] = useState(0);
-  const [isOpenModal, setIsOpenModal] = useState(false);
-  const [onPhoto, setOnPhoto] = useState({ url: "", alt: "" });
+  const [photos, setPhotos] = useState<imageItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<null | string>(null);
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [totalPage, setTotalPage] = useState<number>(0);
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [onPhoto, setOnPhoto] = useState<Photo>({ url: "", alt: "" });
 
   const openModal = () => {
     setIsOpenModal(true);
@@ -27,16 +30,20 @@ function App() {
 
   useEffect(() => {
     if (searchValue.trim() === "") return;
-    const fetchPhotosBySearchValue = async () => {
+    const fetchPhotosBySearchValue = async (): Promise<void> => {
       try {
         setLoading(true);
-
         const data = await fetchPhotosApi(searchValue, pageNumber);
+        console.log(searchValue);
 
         setPhotos((prev) => [...prev, ...data.results]);
         setTotalPage(data.total_pages);
-      } catch (error) {
-        setError(error.message);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          console.log("Unknown error type");
+        }
       } finally {
         setLoading(false);
       }
@@ -44,15 +51,13 @@ function App() {
     fetchPhotosBySearchValue();
   }, [searchValue, pageNumber]);
 
-  const onSubmit = (searchTerm) => {
+  const onSubmit = (searchTerm: string): void => {
     setPhotos([]);
     setSearchValue(searchTerm);
     setPageNumber(1);
   };
-  const onLoadMore = () => {
+  const onLoadMore = (): void => {
     setPageNumber((pageNumber) => pageNumber + 1);
-
-    console.log(pageNumber);
   };
 
   return (

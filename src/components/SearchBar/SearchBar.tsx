@@ -1,5 +1,7 @@
 import css from "./SearchBar.module.css";
-import { ErrorMessage, Field, Form, Formik } from "formik";
+import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
+import { FormEvent } from "react";
+import { search } from "unsplash-js/dist/internals";
 import * as Yup from "yup";
 
 const FeedbackSchema = Yup.object().shape({
@@ -13,8 +15,19 @@ const initialValues = {
   searchTerm: "",
 };
 
-const SearchBar = ({ onSubmit }) => {
-  const handleSubmit = (values, actions) => {
+interface submit {
+  onSubmit: (searchTerm: string) => void;
+}
+
+interface FormValues {
+  searchTerm: string;
+}
+
+const SearchBar: React.FC<submit> = ({ onSubmit }) => {
+  const handleSubmit = (
+    values: FormValues,
+    actions: FormikHelpers<FormValues>
+  ) => {
     onSubmit(values.searchTerm);
     actions.resetForm();
   };
