@@ -3,7 +3,7 @@ import { ApiResponse } from "../types";
 
 export const fetchPhotosApi = async (
   searchValue: string,
-  pageNumber = 1
+  pageNumber: number = 1
 ): Promise<ApiResponse> => {
   const params = {
     query: searchValue,
@@ -11,7 +11,7 @@ export const fetchPhotosApi = async (
     orientation: "landscape",
     per_page: 20,
   };
-  const { data } = await axios.get(
+  const { data } = await axios.get<ApiResponse>(
     "https://api.unsplash.com/search/photos?client_id=A7YRUc57iXs06cE1X3dTKf3BBSG-taztQvX54TDLNgI",
     {
       params,
